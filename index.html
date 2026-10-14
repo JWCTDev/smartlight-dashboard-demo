@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sorting Performance Dashboard</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#1f2937;--muted:#6b7280;--line:#e5e7eb;--accent:#2563eb;--shadow:0 8px 24px rgba(15,23,42,.06);--radius:16px}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+.wrap{max-width:1380px;margin:auto;padding:28px}.header{display:flex;justify-content:space-between;gap:24px;margin-bottom:22px}
+h1{font-size:28px;margin:0 0 6px}.subtitle{color:var(--muted);font-size:14px}.badge{background:#eef2ff;color:#3730a3;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:700}
+.panel,.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.filter-panel{padding:18px 20px;margin-bottom:18px}.filters{display:grid;grid-template-columns:1.2fr 1.2fr .8fr auto;gap:14px;align-items:end}
+label{display:block;font-size:12px;font-weight:700;color:#4b5563;margin-bottom:7px}
+input,select{width:100%;height:42px;border:1px solid #d1d5db;border-radius:10px;padding:0 12px;background:#fff;color:var(--text)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}button{height:42px;border:0;border-radius:10px;padding:0 16px;font-weight:700;cursor:pointer}
+.primary{background:var(--accent);color:white}.secondary{background:#eef2f7;color:#334155}.download{background:#111827;color:white}
+.kpis{display:grid;grid-template-columns:1fr 1fr .72fr .9fr;gap:16px;margin-bottom:18px}.kpi{padding:20px}
+.kpi .label{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}.kpi .value{font-size:32px;font-weight:780;margin-top:8px}
+.kpi .hint{font-size:12px;color:var(--muted);margin-top:6px}.kpi.skip{background:#fafafa;box-shadow:none}.kpi.skip .value{font-size:25px;color:#6b7280}
+.grid{display:grid;gap:18px}.chart-card{padding:20px}.chart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.chart-title{font-size:17px;font-weight:750}.chart-note{font-size:12px;color:var(--muted)}.bars{display:flex;flex-direction:column;gap:13px}
+.bar-row{display:grid;grid-template-columns:120px 1fr 56px;align-items:center;gap:12px}.bar-label{font-size:13px;font-weight:650}.track{height:28px;background:#eef2f7;border-radius:8px;overflow:hidden}
+.fill{height:100%;background:linear-gradient(90deg,#3b82f6,#2563eb);border-radius:8px}.bar-value{text-align:right;font-weight:700;font-size:13px}
+.columns{height:290px;display:flex;align-items:flex-end;gap:12px;padding:18px 8px 0;border-bottom:1px solid var(--line)}
+.col-wrap{flex:1;min-width:32px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}.col-value{font-size:11px;font-weight:700;color:#475569;margin-bottom:5px}
+.col{width:72%;max-width:48px;background:linear-gradient(180deg,#60a5fa,#2563eb);border-radius:7px 7px 0 0;min-height:4px}.col-label{font-size:11px;color:#64748b;margin-top:8px}
+.footer-note{font-size:11px;color:#94a3b8;margin-top:16px;text-align:right}
+@media(max-width:960px){.filters{grid-template-columns:1fr 1fr}.kpis{grid-template-columns:1fr 1fr}}@media(max-width:640px){.wrap{padding:16px}.filters,.kpis{grid-template-columns:1fr}.bar-row{grid-template-columns:90px 1fr 44px}.header{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div><h1>Sorting Performance Dashboard</h1><div class="subtitle">Smart Light System · Productivity overview</div></div>
+    <div class="badge">Demo Dashboard</div>
+  </div>
+
+  <div class="panel filter-panel">
+    <div class="filters">
+      <div><label>From Date & Time</label><input id="fromDt" type="datetime-local" value="2026-10-14T08:00"></div>
+      <div><label>To Date & Time</label><input id="toDt" type="datetime-local" value="2026-10-14T18:00"></div>
+      <div><label>User</label><select id="userFilter"><option value="all">All Users</option><option>User A</option><option>User B</option><option>User C</option><option>User D</option><option>User E</option></select></div>
+      <div class="actions">
+        <button class="primary" onclick="applyFilter()">Search</button>
+        <button class="secondary" onclick="resetFilter()">Reset</button>
+        <button class="download" onclick="downloadCSV()">Download Details</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpis">
+    <div class="card kpi"><div class="label">Total Completed</div><div class="value">1,286</div><div class="hint">Successful sorting completed in selected period</div></div>
+    <div class="card kpi"><div class="label">Total Activated Users</div><div class="value">24</div><div class="hint">Users with at least one sorting activity</div></div>
+    <div class="card kpi skip"><div class="label">Total Skip</div><div class="value">37</div><div class="hint">Operational reference only · not a KPI</div></div>
+    <div class="card kpi"><div class="label">Peak Hour</div><div class="value" style="font-size:25px">14:00–15:00</div><div class="hint">238 completed sorting</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="card chart-card">
+      <div class="chart-head"><div><div class="chart-title">Completed Sorting by User</div><div class="chart-note">Sorted by completed quantity, highest first</div></div></div>
+      <div class="bars" id="userBars"></div>
+    </div>
+
+    <div class="card chart-card">
+      <div class="chart-head"><div><div class="chart-title" id="volumeTitle">Sorting Volume by Hour</div><div class="chart-note">Automatically switches to daily view for multi-day periods</div></div></div>
+      <div class="columns" id="volumeBars"></div>
+    </div>
+  </div>
+
+  <div class="footer-note">Prototype data for customer demonstration only</div>
+</div>
+
+<script>
+const userData=[{user:"User A",completed:132,skip:7},{user:"User D",completed:118,skip:4},{user:"User B",completed:101,skip:9},{user:"User C",completed:82,skip:3},{user:"User E",completed:74,skip:5},{user:"User F",completed:61,skip:2},{user:"User G",completed:56,skip:4}];
+const hourly=[{label:"08:00",value:105},{label:"09:00",value:168},{label:"10:00",value:195},{label:"11:00",value:142},{label:"12:00",value:76},{label:"13:00",value:155},{label:"14:00",value:238},{label:"15:00",value:184},{label:"16:00",value:137},{label:"17:00",value:86}];
+const daily=[{label:"10 Oct",value:928},{label:"11 Oct",value:1044},{label:"12 Oct",value:1168},{label:"13 Oct",value:1096},{label:"14 Oct",value:1286}];
+
+function renderUserBars(data){
+ const el=document.getElementById("userBars"),max=Math.max(...data.map(x=>x.completed),1);
+ el.innerHTML=data.map(x=>`<div class="bar-row" title="Completed: ${x.completed} | Skip: ${x.skip}"><div class="bar-label">${x.user}</div><div class="track"><div class="fill" style="width:${(x.completed/max)*100}%"></div></div><div class="bar-value">${x.completed}</div></div>`).join("");
+}
+function renderVolume(data){
+ const el=document.getElementById("volumeBars"),max=Math.max(...data.map(x=>x.value),1);
+ el.innerHTML=data.map(x=>`<div class="col-wrap"><div class="col-value">${x.value}</div><div class="col" style="height:${Math.max(4,(x.value/max)*230)}px"></div><div class="col-label">${x.label}</div></div>`).join("");
+}
+function applyFilter(){
+ const user=document.getElementById("userFilter").value;
+ const from=new Date(document.getElementById("fromDt").value),to=new Date(document.getElementById("toDt").value);
+ renderUserBars(user==="all"?userData:userData.filter(x=>x.user===user));
+ const hours=(to-from)/36e5;
+ if(hours>24){document.getElementById("volumeTitle").textContent="Total Sorted by Date";renderVolume(daily)}
+ else{document.getElementById("volumeTitle").textContent="Sorting Volume by Hour";renderVolume(hourly)}
+}
+function resetFilter(){document.getElementById("fromDt").value="2026-10-14T08:00";document.getElementById("toDt").value="2026-10-14T18:00";document.getElementById("userFilter").value="all";applyFilter()}
+function downloadCSV(){
+ const rows=[["Date Time","User","Order No.","Pallet Reference","Light ID","Action","Status","Off Method"],["2026-10-14 08:14","User A","ORD-100218","PLT-000381","L-012","Sorting","Completed","QR"],["2026-10-14 08:17","User B","ORD-100219","PLT-000455","L-008","Sorting","Completed","Manual"],["2026-10-14 08:21","User A","ORD-100220","PLT-000477","L-014","Skip","Pending",""],["2026-10-14 08:24","User D","ORD-100221","PLT-000492","L-003","Sorting","Completed","QR"]];
+ const csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");
+ const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=url;a.download="sorting_details_demo.csv";a.click();URL.revokeObjectURL(url)
+}
+renderUserBars(userData);renderVolume(hourly);
+</script>
+</body>
+</html>
